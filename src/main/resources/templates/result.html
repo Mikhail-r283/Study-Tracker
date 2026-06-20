@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Результат</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="container">
+    <h1>Результат</h1>
+
+    <div th:if="${isCorrect}" class="alert alert-success">
+        ✅ Правильно!
+    </div>
+    <div th:unless="${isCorrect}" class="alert alert-danger">
+        ❌ Неправильно! Правильный ответ: <span th:text="${lesson.correctAnswer}"></span>
+    </div>
+
+    <p><strong>Вопрос:</strong> <span th:text="${lesson.question}"></span></p>
+
+    <!-- Показываем правильный ответ -->
+    <div th:switch="${lesson.correctAnswer}">
+        <p th:case="1" th:text="'Правильный ответ: ' + ${lesson.option1}"></p>
+        <p th:case="2" th:text="'Правильный ответ: ' + ${lesson.option2}"></p>
+        <p th:case="3" th:text="'Правильный ответ: ' + ${lesson.option3}"></p>
+        <p th:case="4" th:text="'Правильный ответ: ' + ${lesson.option4}"></p>
+    </div>
+
+    <div class="actions">
+        <a th:href="@{/lessons}" class="btn btn-primary">← К списку уроков</a>
+        <a th:href="@{/dashboard}" class="btn btn-info">📊 Дашборд</a>
+    </div>
+</div>
+</body>
+</html>

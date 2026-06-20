@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Уроки</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="container">
+    <h1>📚 Список уроков</h1>
+
+    <div class="lessons-grid">
+        <div th:each="lesson : ${lessons}" class="lesson-card" th:classappend="${lesson.answered} ? 'answered' : ''">
+            <h3 th:text="${lesson.question}">Вопрос</h3>
+
+            <p>
+                <span th:if="${lesson.answered}" th:text="'✅ Отвечен'">Отвечен</span>
+                <span th:unless="${lesson.answered}" th:text="'❌ Не отвечен'">Не отвечен</span>
+            </p>
+
+            <a th:href="@{/lessons/{id}(id=${lesson.id})}"
+               th:classappend="${lesson.answered} ? 'btn-secondary' : 'btn-primary'"
+               class="btn">
+                <span th:if="${lesson.answered}" th:text="'Посмотреть результат'">Посмотреть результат</span>
+                <span th:unless="${lesson.answered}" th:text="'Ответить'">Ответить</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="actions">
+        <form th:action="@{/lessons/reset}" method="post" style="display:inline;">
+            <button type="submit" class="btn btn-danger">🔄 Сбросить все уроки</button>
+        </form>
+        <a th:href="@{/dashboard}" class="btn btn-info">📊 Дашборд</a>
+    </div>
+</div>
+</body>
+</html>

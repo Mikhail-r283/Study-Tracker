@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Дашборд</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="container">
+    <h1>📊 Дашборд статистики</h1>
+
+    <div class="stats-grid" th:if="${stats}">
+        <div class="stat-card">
+            <h3>📝 Всего уроков</h3>
+            <p class="stat-value" th:text="${stats.totalLessons}">0</p>
+        </div>
+
+        <div class="stat-card">
+            <h3>✅ Отвечено</h3>
+            <p class="stat-value" th:text="${stats.answeredCount}">0</p>
+        </div>
+
+        <div class="stat-card">
+            <h3>🎯 Правильных</h3>
+            <p class="stat-value correct" th:text="${stats.correctCount}">0</p>
+        </div>
+
+        <div class="stat-card">
+            <h3>❌ Неправильных</h3>
+            <p class="stat-value incorrect" th:text="${stats.incorrectCount}">0</p>
+        </div>
+
+        <div class="stat-card">
+            <h3>📊 Процент правильных</h3>
+            <p class="stat-value" th:text="${stats.correctPercent} + '%'">0%</p>
+        </div>
+
+        <div class="stat-card">
+            <h3>🏆 Счёт</h3>
+            <p class="stat-value score" th:text="${stats.score}">0</p>
+        </div>
+    </div>
+    <div class="actions">
+        <a th:href="@{/lessons}" class="btn btn-primary">📚 К урокам</a>
+    </div>
+</div>
+</body>
+</html>
