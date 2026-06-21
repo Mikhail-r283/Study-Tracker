@@ -38,6 +38,11 @@ public class Lesson {
     @Column(name = "is_correct")
     private Boolean isCorrect;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+
     public Lesson() {}
 
     public Lesson(String question, String option1, String option2, String option3, String option4, Integer correctAnswer) {

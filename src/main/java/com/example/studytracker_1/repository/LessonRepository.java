@@ -1,6 +1,7 @@
 package com.example.studytracker_1.repository;
 
 import com.example.studytracker_1.model.Lesson;
+import com.example.studytracker_1.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -22,4 +23,9 @@ public interface LessonRepository extends JpaRepository<Lesson, Long> {
 
     @Query("SELECT COUNT(l) FROM Lesson l WHERE l.isCorrect IS NOT NULL")
     long countAnswered();
+
+    List<Lesson> findByUser(User user);
+    List<Lesson> findByUserIsNull();
+
+    List<Lesson> findByUserId(Long userId);
 }

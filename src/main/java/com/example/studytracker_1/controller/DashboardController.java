@@ -6,6 +6,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.security.Principal;
 import java.util.Map;
 
 @Controller
@@ -18,9 +19,15 @@ public class DashboardController {
         this.dashboardService = dashboardService;
     }
 
+
     @GetMapping
-    public String showDashboard(Model model) {
-        Map<String, Object> stats = dashboardService.getStats();
+    public String showDashboard(Model model, Principal principal) {
+        String username = principal.getName();
+        System.out.println("=== Dashboard for user: " + username + " ===");
+
+        Map<String, Object> stats = dashboardService.getStatsForUser(username);
+        System.out.println("Stats data: " + stats);
+
         model.addAttribute("stats", stats);
         return "dashboard";
     }

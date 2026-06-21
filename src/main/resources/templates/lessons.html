@@ -1,38 +1,243 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Уроки</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <meta charset="UTF-8" />
+    <title>Мои уроки</title>
+    <style>
+        /* Общие стили сброса */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Заголовок */
+        h1 {
+            color: white;
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 40px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        /* Шапка с кнопками */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        /* Кнопка Дашборд */
+        .btn-dashboard {
+            padding: 12px 30px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 50px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-dashboard:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-dashboard::before {
+            content: "📊";
+            font-size: 1.2em;
+        }
+
+        /* Кнопка Выйти */
+        .btn-logout {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid white;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .btn-logout:hover {
+            background: white;
+            color: #667eea;
+        }
+
+        /* Остальные стили остаются без изменений */
+        .empty-state {
+            text-align: center;
+            background: white;
+            border-radius: 15px;
+            padding: 60px 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .empty-state h2 {
+            color: #333;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+        }
+
+        .empty-state p {
+            color: #666;
+            font-size: 1.1em;
+            margin-bottom: 30px;
+        }
+
+        .lesson-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .lesson-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .lesson-info {
+            flex: 1;
+        }
+
+        .lesson-title {
+            color: #333;
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .lesson-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+
+        .status-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        /* Общие стили для кнопок */
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 600px) {
+            .lesson-card {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+            h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
 </head>
 <body>
 <div class="container">
-    <h1>📚 Список уроков</h1>
+    <!-- Шапка с кнопками -->
+    <div class="header">
+        <a th:href="@{/dashboard}" class="btn-dashboard">Дашборд</a>
+        <form th:action="@{/logout}" method="post" style="margin: 0;">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+            <button type="submit" class="btn-logout">Выйти</button>
+        </form>
+    </div>
 
-    <div class="lessons-grid">
-        <div th:each="lesson : ${lessons}" class="lesson-card" th:classappend="${lesson.answered} ? 'answered' : ''">
-            <h3 th:text="${lesson.question}">Вопрос</h3>
+    <h1>📚 Мои уроки</h1>
 
-            <p>
-                <span th:if="${lesson.answered}" th:text="'✅ Отвечен'">Отвечен</span>
-                <span th:unless="${lesson.answered}" th:text="'❌ Не отвечен'">Не отвечен</span>
-            </p>
+    <!-- Пустое состояние -->
+    <div class="empty-state" th:if="${lessons == null or #lists.isEmpty(lessons)}">
+        <div style="font-size: 4em; margin-bottom: 20px;">📖</div>
+        <h2>Уроков пока нет</h2>
+        <p>Добавьте свои первые уроки, чтобы начать обучение!</p>
+    </div>
 
+    <!-- Список уроков -->
+    <div th:unless="${lessons == null or #lists.isEmpty(lessons)}">
+        <div class="lesson-card" th:each="lesson : ${lessons}">
+            <div class="lesson-info">
+                <div class="lesson-question" th:text="${lesson.question}">Название урока</div>
+                <div>
+                    <span class="lesson-status"
+                          th:classappend="${lesson.answered} ? 'status-completed' : 'status-pending'"
+                          th:text="${lesson.answered} ? '✅ Завершён' : '⏳ Ожидает ответа'">
+                        Статус
+                    </span>
+                </div>
+            </div>
             <a th:href="@{/lessons/{id}(id=${lesson.id})}"
                th:classappend="${lesson.answered} ? 'btn-secondary' : 'btn-primary'"
                class="btn">
-                <span th:if="${lesson.answered}" th:text="'Посмотреть результат'">Посмотреть результат</span>
-                <span th:unless="${lesson.answered}" th:text="'Ответить'">Ответить</span>
+                <span th:if="${lesson.answered}" th:text="'📊 Посмотреть результат'">Посмотреть результат</span>
+                <span th:unless="${lesson.answered}" th:text="'✏️ Ответить'">Ответить</span>
             </a>
         </div>
-    </div>
-
-    <div class="actions">
-        <form th:action="@{/lessons/reset}" method="post" style="display:inline;">
-            <button type="submit" class="btn btn-danger">🔄 Сбросить все уроки</button>
-        </form>
-        <a th:href="@{/dashboard}" class="btn btn-info">📊 Дашборд</a>
     </div>
 </div>
 </body>

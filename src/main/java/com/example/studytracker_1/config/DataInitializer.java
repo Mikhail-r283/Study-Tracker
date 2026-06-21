@@ -20,7 +20,7 @@ public class DataInitializer implements CommandLineRunner {
     }
     @Override
     public void run(String... args) {
-        if (lessonRepository.count() == 0) {
+         if (lessonRepository.count() == 0) {
             lessonRepository.save(new Lesson("Что такое Java?",
                     "Язык программирования", "База данных", "Операционная система", "Фреймворк", 1));
             lessonRepository.save(new Lesson("Что такое Spring Boot?",
@@ -32,6 +32,8 @@ public class DataInitializer implements CommandLineRunner {
             lessonRepository.save(new Lesson("Что такое JPA?",
                     "Java Platform API", "Java Persistence API", "Java Programming API", "Java Process API", 2));
         }
+
+
 
         if (statisticsRepository.count() == 0) {
             Statistics stats = new Statistics();

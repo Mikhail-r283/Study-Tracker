@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Регистрация</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .auth-card {
+            background: white;
+            border-radius: 20px;
+            padding: 50px 40px;
+            max-width: 450px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .auth-header .icon {
+            font-size: 3.5em;
+            margin-bottom: 10px;
+        }
+
+        .auth-header h1 {
+            color: #333;
+            font-size: 1.8em;
+            font-weight: 700;
+        }
+
+        .auth-header p {
+            color: #888;
+            font-size: 0.95em;
+            margin-top: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #555;
+            font-weight: 600;
+            font-size: 0.9em;
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1em;
+            color: #333;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+            outline: none;
+        }
+
+        .form-control:focus {
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+        }
+
+        .form-control::placeholder {
+            color: #aaa;
+        }
+
+        .text-danger {
+            color: #dc3545;
+            font-size: 0.85em;
+            margin-top: 5px;
+            display: block;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.05em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin-top: 10px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .auth-footer p {
+            color: #888;
+            font-size: 0.9em;
+        }
+        .auth-footer a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .auth-footer a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
+        .auth-footer .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #888;
+            font-size: 0.9em;
+            margin-top: 12px;
+            transition: color 0.3s ease;
+        }
+
+        .auth-footer .back-link:hover {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        @media (max-width: 480px) {
+            .auth-card {
+                padding: 30px 25px;
+            }
+            .auth-header h1 {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="auth-card">
+    <div class="auth-header">
+        <div class="icon">📝</div>
+        <h1>Регистрация</h1>
+        <p>Создайте аккаунт для доступа к урокам</p>
+    </div>
+
+    <form th:action="@{/register}" method="post">
+        <div class="form-group">
+            <label for="username">👤 Имя пользователя</label>
+            <input type="text" id="username" name="username" class="form-control" placeholder="Придумайте имя пользователя" th:value="${userDto?.username}">
+            <!-- УБРАЛИ th:errors="*{username}" -->
+            <span th:if="${usernameError}" class="text-danger" th:text="${usernameError}"></span>
+        </div>
+
+        <div class="form-group">
+            <label for="email">📧 Email</label>
+            <input type="email" id="email" name="email" class="form-control" placeholder="Введите ваш email" th:value="${userDto?.email}">
+            <!-- УБРАЛИ th:errors="*{email}" -->
+            <span th:if="${emailError}" class="text-danger" th:text="${emailError}"></span>
+        </div>
+
+        <div class="form-group">
+            <label for="password">🔑 Пароль</label>
+            <input type="password" id="password" name="password" class="form-control" placeholder="Придумайте надёжный пароль" th:value="${userDto?.password}">
+            <!-- УБРАЛИ th:errors="*{password}" -->
+        </div>
+
+        <button type="submit" class="btn btn-primary">✨ Зарегистрироваться</button>
+    </form>
+
+    <div class="auth-footer">
+        <p>Уже есть аккаунт? <a th:href="@{/login}">Войти</a></p>
+        <a th:href="@{/}" class="back-link">← На главную</a>
+    </div>
+</div>
+</body>
+</html>
