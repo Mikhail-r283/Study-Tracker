@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Setter
 @Getter
 @Entity
@@ -33,7 +36,7 @@ public class Lesson {
     private Integer correctAnswer;
 
     @Column(name = "is_answered")
-    private boolean answered = false;
+    private Boolean answered = false;
 
     @Column(name = "is_correct")
     private Boolean isCorrect;
@@ -42,6 +45,17 @@ public class Lesson {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Column(columnDefinition = "TEXT")
+    private String description;        // описание урока
+
+    @Column(name = "difficulty")
+    private String difficulty = "EASY"; // EASY, MEDIUM, HARD
+
+    @Column(name = "points")
+    private Integer points = 0;        // баллы за урок
+
+    @Column(name = "ai_generated")
+    private Boolean aiGenerated = false; // создан ли AI
 
     public Lesson() {}
 

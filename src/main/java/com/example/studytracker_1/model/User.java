@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.List;
@@ -26,6 +27,12 @@ public class User {
 
     @Column(unique = true, nullable = false)
     private String email;
+
+    @Column(name = "total_points")
+    private Integer totalPoints = 0;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

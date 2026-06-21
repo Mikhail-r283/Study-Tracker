@@ -204,12 +204,49 @@
     <div class="header">
         <a th:href="@{/dashboard}" class="btn-dashboard">Дашборд</a>
         <form th:action="@{/logout}" method="post" style="margin: 0;">
-            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+            <!-- Удаляем _csrf -->
             <button type="submit" class="btn-logout">Выйти</button>
         </form>
     </div>
 
     <h1>📚 Мои уроки</h1>
+
+    <div style="background: #f0f4ff; border: 2px dashed #667eea; border-radius: 12px; padding: 20px; margin-bottom: 30px;">
+        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+            <span style="font-size: 2em;">🤖</span>
+            <div>
+                <h3 style="margin: 0; color: #333;">Создать урок с помощью AI</h3>
+                <p style="margin: 5px 0 0 0; color: #666;">Введите тему, и нейросеть сгенерирует готовый урок</p>
+            </div>
+        </div>
+
+        <form th:action="@{/lessons/generate}" method="post" onsubmit="return confirm('Сгенерировать урок? Это может занять несколько секунд')">
+            <div style="display: flex; gap: 10px;">
+                <input type="text"
+                       name="question"
+                       placeholder="Например: Производные функции, Вторая мировая война, Солнечная система..."
+                       required
+                       style="flex: 1; padding: 12px 15px; border: 2px solid #667eea; border-radius: 8px; font-size: 16px;">
+                <button type="submit"
+                        style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                               color: white;
+                               border: none;
+                               padding: 12px 25px;
+                               border-radius: 8px;
+                               font-size: 16px;
+                               font-weight: bold;
+                               cursor: pointer;
+                               white-space: nowrap;
+                               transition: transform 0.2s;"
+                        onmouseover="this.style.transform='scale(1.05)'"
+                        onmouseout="this.style.transform='scale(1)'">
+                    ✨ Сгенерировать
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <br><br> <!-- Отступ между формой и списком -->
 
     <!-- Пустое состояние -->
     <div class="empty-state" th:if="${lessons == null or #lists.isEmpty(lessons)}">

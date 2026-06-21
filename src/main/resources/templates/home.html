@@ -1,18 +1,171 @@
+
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<html>
 <head>
     <meta charset="UTF-8">
-    <title>StudyTracker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyTracker - Главная</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .auth-card {
+            background: white;
+            border-radius: 20px;
+            padding: 60px 50px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.5s ease;
+            text-align: center;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .auth-header {
+            margin-bottom: 40px;
+        }
+        .auth-header .icon {
+            font-size: 5em;
+            margin-bottom: 15px;
+            display: block;
+        }
+        .auth-header h1 {
+            color: #333;
+            font-size: 2.5em;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .auth-header p {
+            color: #888;
+            font-size: 1.1em;
+            margin-top: 10px;
+        }
+        .features {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 35px;
+        }
+        .feature-item {
+            background: #f8f9fa;
+            padding: 20px 15px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+        .feature-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .feature-item .feature-icon {
+            font-size: 2em;
+            margin-bottom: 8px;
+        }
+        .feature-item .feature-text {
+            color: #555;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+        .btn {
+            display: inline-block;
+            padding: 16px 40px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.05em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #555;
+        }
+        .btn-secondary:hover {
+            background: #e0e0e0;
+            transform: translateY(-2px);
+        }
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        @media (max-width: 480px) {
+            .auth-card {
+                padding: 40px 25px;
+            }
+            .auth-header h1 {
+                font-size: 1.8em;
+            }
+            .features {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-<div class="container text-center">
-    <h1>StudyTracker</h1>
-    <p>Система для отслеживания учебных материалов</p>
-    <div class="mt-4">
-        <a th:href="@{/login}" class="btn btn-primary">Войти</a>
-        <a th:href="@{/register}" class="btn btn-secondary">Регистрация</a>
+<div class="auth-card">
+    <div class="auth-header">
+        <span class="icon">📚</span>
+
+        <h1>StudyTracker</h1>
+        <p>Система для отслеживания учебных материалов</p>
+    </div>
+
+    <div class="features">
+        <div class="feature-item">
+            <div class="feature-icon">📝</div>
+            <div class="feature-text">Уроки</div>
+        </div>
+        <div class="feature-item">
+            <div class="feature-icon">📊</div>
+            <div class="feature-text">Статистика</div>
+        </div>
+        <div class="feature-item">
+            <div class="feature-icon">🎯</div>
+            <div class="feature-text">Прогресс</div>
+        </div>
+        <div class="feature-item">
+            <div class="feature-icon">🏆</div>
+            <div class="feature-text">Достижения</div>
+        </div>
+    </div>
+
+    <div class="btn-group">
+        <a th:href="@{/login}" class="btn btn-primary">🚀 Войти</a>
+        <a th:href="@{/register}" class="btn btn-secondary">✨ Регистрация</a>
     </div>
 </div>
 </body>

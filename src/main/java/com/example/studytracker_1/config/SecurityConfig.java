@@ -27,6 +27,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/", "/register", "/login", "/css/**", "/js/**", "/images/**").permitAll()
                         .requestMatchers("/lessons/**").authenticated()
@@ -35,15 +36,21 @@ public class SecurityConfig {
                 .userDetailsService(userDetailsService)
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .defaultSuccessUrl("/lessons")
+                        .defaultSuccessUrl("/lessons", true)
                         .permitAll()
                 )
+                .rememberMe(remember -> remember
+                        .key("StudyTrackerSecretKey2024!@#$%")
+                        .tokenValiditySeconds(7 * 24 * 60 * 60) // 7 дней
+                        .rememberMeParameter("remember-me") // имя поля в форме
+                        .userDetailsService(userDetailsService)
+                )
                 .logout(logout -> logout
-                        .logoutUrl("/logout")              // URL для выхода
-                        .logoutSuccessUrl("/login?logout") // куда перенаправить после выхода
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login?logout")
                         .invalidateHttpSession(true)
                         .clearAuthentication(true)
-                        .deleteCookies("JSESSIONID")
+                        .deleteCookies("JSESSIONID", "remember-me") // удаляем и куки remember-me
                         .permitAll()
                 );
 

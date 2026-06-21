@@ -4,7 +4,10 @@ import com.example.studytracker_1.dto.AnswerRequest;
 import com.example.studytracker_1.model.Lesson;
 import com.example.studytracker_1.model.User;
 import com.example.studytracker_1.repository.UserRepository;
+import com.example.studytracker_1.service.AiService;
 import com.example.studytracker_1.service.LessonService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +17,7 @@ import java.security.Principal;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/lessons")
@@ -21,10 +25,12 @@ public class LessonController {
 
     private final LessonService lessonService;
     private final UserRepository userRepository;
+    private final AiService aiService;
 
-    public LessonController(LessonService lessonService, UserRepository userRepository) {
+    public LessonController(LessonService lessonService, UserRepository userRepository, AiService aiService) {
         this.lessonService = lessonService;
         this.userRepository = userRepository;
+        this.aiService = aiService;
     }
 
     @GetMapping("/{id}")
@@ -142,4 +148,45 @@ public class LessonController {
         model.addAttribute("lessons", lessons);
         return "lessons";
     }
+    @PostMapping("/generate")
+    public String generateLesson(@RequestParam String question,
+                                Principal principal,
+                                 RedirectAttributes redirectAttributes) {
+        System.out.println("🎯 POST /lessons/generate - Начинаем генерацию");
+        System.out.println("📝 Тема: " + question);
+        System.out.println("👤 Пользователь: " + (principal != null ? principal.getName() : "не найден"));
+
+        try {
+            if (principal == null) {
+                redirectAttributes.addFlashAttribute("error", "Вы не авторизованы");
+                return "redirect:/login";
+            }
+
+            User user = userRepository.findByUsername(principal.getName())
+                    .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+
+           System.out.println("👤 Пользователь найден: " + user.getUsername());
+
+            if (question == null || question.trim().isEmpty()) {
+                redirectAttributes.addFlashAttribute("error", "Введите тему урока");
+                return "redirect:/lessons";
+            }
+
+            // Генерируем урок
+            Lesson lesson = aiService.generateLesson(question.trim(), user);
+
+          System.out.println("✅ Урок создан! ID: " + lesson.getId() + ", Название: " + lesson.getQuestion());
+
+            redirectAttributes.addFlashAttribute("success", "Урок '" + lesson.getQuestion() + "' успешно создан!");
+
+        } catch (Exception e) {
+           System.out.println("❌ Ошибка генерации: " + e.getMessage());
+           e.printStackTrace();
+            redirectAttributes.addFlashAttribute("error", "Не удалось создать урок: " + e.getMessage());
+        }
+
+        return "redirect:/lessons";
+    }
 }
+
+
