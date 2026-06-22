@@ -1,5 +1,6 @@
 package com.example.studytracker_1.model;
 
+import com.example.studytracker_1.entity.Tag;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -56,6 +57,14 @@ public class Lesson {
 
     @Column(name = "ai_generated")
     private Boolean aiGenerated = false; // создан ли AI
+
+    @ManyToMany
+    @JoinTable(
+            name = "lesson_tags",
+            joinColumns = @JoinColumn(name = "lesson_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private Set<Tag> tags = new HashSet<>();
 
     public Lesson() {}
 

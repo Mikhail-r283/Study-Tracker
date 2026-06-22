@@ -30,7 +30,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/", "/register", "/login", "/css/**", "/js/**", "/images/**").permitAll()
-                        .requestMatchers("/lessons/**").authenticated()
+                        .requestMatchers("/lessons/**").authenticated()  // ✅ С ЗВЁЗДОЧКАМИ!
                         .anyRequest().authenticated()
                 )
                 .userDetailsService(userDetailsService)
@@ -41,8 +41,8 @@ public class SecurityConfig {
                 )
                 .rememberMe(remember -> remember
                         .key("StudyTrackerSecretKey2024!@#$%")
-                        .tokenValiditySeconds(7 * 24 * 60 * 60) // 7 дней
-                        .rememberMeParameter("remember-me") // имя поля в форме
+                        .tokenValiditySeconds(7 * 24 * 60 * 60)
+                        .rememberMeParameter("remember-me")
                         .userDetailsService(userDetailsService)
                 )
                 .logout(logout -> logout
@@ -50,7 +50,7 @@ public class SecurityConfig {
                         .logoutSuccessUrl("/login?logout")
                         .invalidateHttpSession(true)
                         .clearAuthentication(true)
-                        .deleteCookies("JSESSIONID", "remember-me") // удаляем и куки remember-me
+                        .deleteCookies("JSESSIONID", "remember-me")
                         .permitAll()
                 );
 
