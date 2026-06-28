@@ -2,47 +2,376 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Дашборд</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 Дашборд статистики</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 40px;
+            font-size: 2.5em;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-card h3 {
+            color: #666;
+            font-size: 1em;
+            margin-bottom: 15px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: #333;
+            margin: 10px 0;
+        }
+
+        .stat-value.correct {
+            color: #27ae60;
+            animation: pulse 2s infinite;
+        }
+
+        .stat-value.incorrect {
+            color: #e74c3c;
+        }
+
+        .stat-value.score {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 3em;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .progress-section {
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .progress-bar-container {
+            margin: 20px 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 15px;
+            transition: width 1s ease;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: attr(data-label);
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: white;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .progress-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .info-item {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid #eee;
+        }
+
+        .info-item .label {
+            color: #888;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .info-item .value {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .info-item .value.green {
+            color: #27ae60;
+        }
+
+        .info-item .value.red {
+            color: #e74c3c;
+        }
+
+        .info-item .value.blue {
+            color: #3498db;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 32px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+
+            .stat-value {
+                font-size: 2em;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
+
 <body>
 <div class="container">
-    <h1>📊 Дашборд статистики</h1>
+    <h1>📊 Панель статистики</h1>
 
+    <!-- Основная статистика -->
     <div class="stats-grid" th:if="${stats}">
         <div class="stat-card">
-            <h3>📝 Всего уроков</h3>
-            <p class="stat-value" th:text="${stats.totalLessons}">0</p>
+            <h3>📚 Всего уроков</h3>
+            <p class="stat-value" th:text="${stats['totalLessons']}">0</p>
         </div>
-
         <div class="stat-card">
-            <h3>✅ Отвечено</h3>
-            <p class="stat-value" th:text="${stats.answeredCount}">0</p>
+            <h3>✅ Отвечено уроков</h3>
+            <p class="stat-value correct" th:text="${stats['answeredLessons']}">0</p>
         </div>
-
         <div class="stat-card">
-            <h3>🎯 Правильных</h3>
-            <p class="stat-value correct" th:text="${stats.correctCount}">0</p>
+            <h3>⏳ Ожидают</h3>
+            <p class="stat-value" th:text="${stats['unansweredLessons']}">0</p>
         </div>
-
+        <div class="stat-card">
+            <h3>🎯 Правильных ответов</h3>
+            <p class="stat-value correct" th:text="${stats['correctQuestions']}">0</p>
+        </div>
         <div class="stat-card">
             <h3>❌ Неправильных</h3>
-            <p class="stat-value incorrect" th:text="${stats.incorrectCount}">0</p>
+            <p class="stat-value incorrect" th:text="${stats['incorrectQuestions']}">0</p>
         </div>
-
         <div class="stat-card">
-            <h3>📊 Процент правильных</h3>
-            <p class="stat-value" th:text="${stats.correctPercent} + '%'">0%</p>
+            <h3>📊 Процент</h3>
+            <p class="stat-value" th:text="${stats['correctPercent']} + '%'">0%</p>
         </div>
-
         <div class="stat-card">
             <h3>🏆 Счёт</h3>
-            <p class="stat-value score" th:text="${stats.score}">0</p>
+            <p class="stat-value score" th:text="${stats['score']}">0</p>
         </div>
     </div>
+
+    <!-- Прогресс-бар -->
+    <div class="progress-section" th:if="${stats['totalQuestions'] != null and stats['totalQuestions'] > 0}">
+        <h3 style="text-align:center; color:#333; margin-bottom:20px;">📈 Прогресс обучения</h3>
+        <div class="progress-bar-container">
+            <div class="progress-bar">
+                <div class="progress-fill" th:style="'width: ' + ${stats['score']} + '%'" th:data-label="${stats['score']} + '%'"></div>
+            </div>
+            <div class="progress-stats">
+                <span>✅ Правильно: <strong th:text="${stats['correctQuestions']}">0</strong></span>
+                <span>❌ Неправильно: <strong th:text="${stats['incorrectQuestions']}">0</strong></span>
+                <span>📝 Всего вопросов: <strong th:text="${stats['totalQuestions']}">0</strong></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Детальная статистика -->
+    <div class="info-grid">
+        <div class="info-item">
+            <div class="label">📝 Всего вопросов</div>
+            <div class="value blue" th:text="${stats != null ? stats.get('totalQuestions') : 0}">0</div>
+        </div>
+        <div class="info-item">
+            <div class="label">✅ Отвечено вопросов</div>
+            <div class="value green" th:text="${stats != null ? stats.get('answeredQuestions') : 0}">0</div>
+        </div>
+        <div class="info-item">
+            <div class="label">❌ Неотвеченные вопросы</div>
+            <div class="value red" th:text="${stats != null ? (stats.get('totalQuestions') - stats.get('answeredQuestions')) : 0}">0</div>
+        </div>
+        <div class="info-item">
+            <div class="label">🎯 Правильные ответы</div>
+            <div class="value green" th:text="${stats != null ? stats.get('correctQuestions') : 0}">0</div>
+        </div>
+        <div class="info-item">
+            <div class="label">❌ Ошибки</div>
+            <div class="value red" th:text="${stats != null ? stats.get('incorrectQuestions') : 0}">0</div>
+        </div>
+        <div class="info-item">
+            <div class="label">📊 Процент успеха</div>
+            <div class="value" style="color: #667eea;" th:text="${stats != null ? (stats.get('correctPercent') + '%') : '0%'}">0%</div>
+        </div>
+    </div>
+    <!-- Кнопки навигации -->
     <div class="actions">
-        <a th:href="@{/lessons}" class="btn btn-primary">📚 К урокам</a>
+        <a th:href="@{/lessons}" class="btn btn-secondary">📚 К урокам</a>
+        <a th:href="@{/profile}" class="btn btn-secondary">👤 Профиль</a>
     </div>
 </div>
 </body>
+
 </html>

@@ -4,7 +4,6 @@ import com.example.studytracker_1.model.Role;
 import com.example.studytracker_1.model.User;
 import com.example.studytracker_1.repository.RoleRepository;
 import com.example.studytracker_1.repository.UserRepository;
-import com.example.studytracker_1.service.LessonTemplateService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -33,9 +32,6 @@ public class AuthController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private LessonTemplateService lessonTemplateService;
 
 
     @GetMapping("/login")
@@ -83,12 +79,9 @@ public class AuthController {
 
         userRepository.save(user);
 
-        lessonTemplateService.createDefaultLessonsForUser(user);
-
         return "redirect:/login?registered";
     }
 
-    // DTO класс внутри контроллера
     @Setter
     @Getter
     public static class UserDto {

@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет</title>
+    <link rel="stylesheet" href="/css/style.css">
+
+    <style>
+        :root {
+            --bg: #f4f7fb;
+            --card: rgba(255, 255, 255, 0.9);
+            --card-border: rgba(255, 255, 255, 0.7);
+            --text: #1f2937;
+            --muted: #6b7280;
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --shadow: 0 10px 30px rgba(31, 41, 55, 0.10);
+            --radius: 24px;
+            --radius-sm: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background:
+                    radial-gradient(circle at top left, rgba(99, 102, 241, 0.12), transparent 35%),
+                    radial-gradient(circle at top right, rgba(16, 185, 129, 0.10), transparent 30%),
+                    var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 32px 20px 48px;
+        }
+
+        .container {
+            max-width: 1240px;
+            margin: 0 auto;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .back-link,
+        .action-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 18px;
+            border-radius: 999px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.25s ease;
+            border: 1px solid rgba(99, 102, 241, 0.14);
+        }
+
+        .back-link {
+            background: white;
+            color: var(--primary-dark);
+            box-shadow: var(--shadow);
+        }
+
+        .back-link:hover {
+            transform: translateY(-2px);
+            background: #eef2ff;
+        }
+
+        .action-link {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.25);
+        }
+
+        .action-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 24px rgba(99, 102, 241, 0.30);
+        }
+
+        .page-title {
+            margin-bottom: 20px;
+        }
+
+        .page-title h1 {
+            font-size: 32px;
+            line-height: 1.1;
+            margin-bottom: 8px;
+        }
+
+        .page-title p {
+            color: var(--muted);
+            font-size: 15px;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 360px minmax(0, 1fr);
+            gap: 24px;
+            align-items: start;
+        }
+
+        .card {
+            background: var(--card);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            box-shadow: var(--shadow);
+            border-radius: var(--radius);
+        }
+
+        .profile-card {
+            padding: 28px;
+            position: sticky;
+            top: 20px;
+        }
+
+        .avatar-wrap {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 18px;
+        }
+
+        .avatar {
+            width: 118px;
+            height: 118px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 4px solid white;
+            box-shadow: 0 12px 30px rgba(79, 70, 229, 0.22);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            font-size: 42px;
+            font-weight: 800;
+        }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-name {
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .profile-name h2 {
+            font-size: 24px;
+            margin-bottom: 6px;
+        }
+
+        .profile-name .username {
+            color: var(--muted);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .bio {
+            margin-top: 18px;
+            padding: 16px;
+            background: #f8fafc;
+            border-radius: var(--radius-sm);
+            color: #374151;
+            line-height: 1.55;
+            border: 1px solid #e5e7eb;
+        }
+
+        .mini-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        .mini-stat {
+            padding: 14px 14px;
+            border-radius: 16px;
+            background: #fff;
+            border: 1px solid #eef2f7;
+        }
+
+        .mini-stat .label {
+            display: block;
+            color: var(--muted);
+            font-size: 12px;
+            margin-bottom: 6px;
+        }
+
+        .mini-stat .value {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--text);
+        }
+
+        .main {
+            display: grid;
+            gap: 24px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .stat-card {
+            padding: 22px;
+            border-radius: var(--radius);
+            background: var(--card);
+            border: 1px solid var(--card-border);
+            box-shadow: var(--shadow);
+        }
+
+        .stat-card .label {
+            color: var(--muted);
+            font-size: 13px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .stat-card .value {
+            font-size: 30px;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .stat-card.points .value {
+            color: var(--primary-dark);
+        }
+
+        .stat-card.progress .value {
+            color: var(--success);
+        }
+
+        .stat-card.average .value {
+            color: var(--warning);
+        }
+
+        .info-card,
+        .lessons-card {
+            padding: 28px;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .section-title h3 {
+            font-size: 20px;
+        }
+
+        .info-list {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .info-item {
+            padding: 16px;
+            border-radius: 16px;
+            background: #f8fafc;
+            border: 1px solid #eef2f7;
+        }
+
+        .info-item .key {
+            display: block;
+            color: var(--muted);
+            font-size: 12px;
+            margin-bottom: 6px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .info-item .value {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text);
+            word-break: break-word;
+        }
+
+        .empty-bio {
+            color: var(--muted);
+            font-style: italic;
+        }
+
+        .lessons-list {
+            display: grid;
+            gap: 14px;
+        }
+
+        .lesson-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            padding: 18px;
+            border-radius: 18px;
+            background: #ffffff;
+            border: 1px solid #eef2f7;
+            transition: 0.2s ease;
+        }
+
+        .lesson-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(31, 41, 55, 0.06);
+        }
+
+        .lesson-main {
+            min-width: 0;
+        }
+
+        .lesson-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            word-break: break-word;
+        }
+
+        .lesson-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .badge.easy {
+            background: #ecfdf5;
+            color: #059669;
+        }
+
+        .badge.medium {
+            background: #fffbeb;
+            color: #d97706;
+        }
+
+        .badge.hard {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .points {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 999px;
+            background: #eef2ff;
+            color: var(--primary-dark);
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .lesson-date {
+            color: var(--muted);
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--muted);
+        }
+
+        .empty-state .icon {
+            font-size: 52px;
+            margin-bottom: 12px;
+        }
+
+        @media (max-width: 980px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-card {
+                position: static;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .info-list {
+                grid-template-columns: 1fr;
+            }
+
+            .lesson-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .lesson-date {
+                white-space: normal;
+            }
+
+            .page-title h1 {
+                font-size: 26px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <div class="topbar">
+        <a href="/lessons" class="back-link">← К урокам</a>
+        <a href="/dashboard" class="action-link">Перейти в дашборд</a>
+    </div>
+
+    <div class="page-title">
+        <h1>Личный кабинет</h1>
+        <p>Вся информация о вашем профиле, статистике и последних уроках.</p>
+    </div>
+
+    <div class="layout">
+        <!-- Левая колонка -->
+        <aside class="card profile-card">
+            <div class="avatar-wrap">
+                <div class="avatar" th:if="${profile.avatarUrl == null or #strings.isEmpty(profile.avatarUrl)}"
+                     th:text="${profile.firstName != null and !#strings.isEmpty(profile.firstName) ? #strings.substring(profile.firstName, 0, 1) : 'U'}">
+                    U
+                </div>
+
+                <div class="avatar" th:if="${profile.avatarUrl != null and !#strings.isEmpty(profile.avatarUrl)}">
+                    <img th:src="${profile.avatarUrl}" alt="Аватар">
+                </div>
+            </div>
+
+            <div class="profile-name">
+                <h2 th:text="${profile.fullName != null and !#strings.isEmpty(profile.fullName) ? profile.fullName : profile.username}">
+                    Имя пользователя
+                </h2>
+                <div class="username" th:text="|@${profile.username}|">@username</div>
+            </div>
+
+            <div class="bio" th:if="${profile.bio != null and !#strings.isEmpty(profile.bio)}"
+                 th:text="${profile.bio}">
+                Описание пользователя
+            </div>
+
+            <div class="bio empty-bio" th:if="${profile.bio == null or #strings.isEmpty(profile.bio)}">
+                Пользователь пока не добавил описание профиля.
+            </div>
+
+            <div class="mini-grid">
+                <div class="mini-stat">
+                    <span class="label">Баллы</span>
+                    <div class="value" th:text="${profile.totalPoints != null ? profile.totalPoints : 0}">0</div>
+                </div>
+                <div class="mini-stat">
+                    <span class="label">Уроки</span>
+                    <div class="value" th:text="${profile.totalLessons}">0</div>
+                </div>
+                <div class="mini-stat">
+                    <span class="label">Завершено</span>
+                    <div class="value" th:text="${profile.completedLessons}">0</div>
+                </div>
+                <div class="mini-stat">
+                    <span class="label">Средний балл</span>
+                    <div class="value" th:text="${#numbers.formatDecimal(profile.averageScore, 1, 1)}">0.0</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Правая колонка -->
+        <main class="main">
+            <section class="stats-grid">
+                <div class="stat-card points">
+                    <div class="label">Всего баллов</div>
+                    <div class="value" th:text="${profile.totalPoints != null ? profile.totalPoints : 0}">0</div>
+                </div>
+
+                <div class="stat-card progress">
+                    <div class="label">Пройдено уроков</div>
+                    <div class="value" th:text="|${profile.completedLessons}/${profile.totalLessons}|">0/0</div>
+                </div>
+
+                <div class="stat-card average">
+                    <div class="label">Средний балл</div>
+                    <div class="value" th:text="${#numbers.formatDecimal(profile.averageScore, 1, 1)}">0.0</div>
+                </div>
+            </section>
+
+            <section class="card info-card">
+                <div class="section-title">
+                    <h3>Информация о пользователе</h3>
+                </div>
+
+                <div class="info-list">
+                    <div class="info-item">
+                        <span class="key">Username</span>
+                        <div class="value" th:text="${profile.username}">username</div>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="key">Email</span>
+                        <div class="value" th:text="${profile.email}">email@example.com</div>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="key">Имя</span>
+                        <div class="value" th:text="${profile.firstName != null ? profile.firstName : '—'}">—</div>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="key">Фамилия</span>
+                        <div class="value" th:text="${profile.lastName != null ? profile.lastName : '—'}">—</div>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="key">Дата регистрации</span>
+                        <div class="value"
+                             th:text="${profile.createdAt != null ? #temporals.format(profile.createdAt, 'dd.MM.yyyy') : '—'}">
+                            01.01.2024
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="key">Последнее обновление</span>
+                        <div class="value"
+                             th:text="${profile.updatedAt != null ? #temporals.format(profile.updatedAt, 'dd.MM.yyyy HH:mm') : '—'}">
+                            —
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card lessons-card">
+                <div class="section-title">
+                    <h3>Последние уроки</h3>
+                </div>
+
+                <div class="lessons-list"
+                     th:if="${profile.recentLessons != null and !#lists.isEmpty(profile.recentLessons)}">
+                    <div class="lesson-item" th:each="lesson : ${profile.recentLessons}">
+                        <div class="lesson-main">
+                            <div class="lesson-title" th:text="${lesson.title}">Название урока</div>
+                            <div class="lesson-meta">
+                                <span class="badge"
+                                      th:classappend="${lesson.difficulty != null ? ' ' + #strings.toLowerCase(lesson.difficulty) : ' easy'}"
+                                      th:text="${lesson.difficulty != null ? lesson.difficulty : 'EASY'}">
+                                    EASY
+                                </span>
+
+                                <span class="points" th:text="|${lesson.points}/${lesson.totalPoints}|">10/10</span>
+
+                                <span th:if="${lesson.answered}" style="color: var(--success); font-weight: 700;">✅ Завершён</span>
+                                <span th:unless="${lesson.answered}" style="color: var(--warning); font-weight: 700;">⏳ В процессе</span>
+                            </div>
+                        </div>
+
+                        <div class="lesson-date"
+                             th:text="${lesson.createdAt != null ? #temporals.format(lesson.createdAt, 'dd.MM.yyyy') : '—'}">
+                            01.01.2024
+                        </div>
+                    </div>
+                </div>
+
+                <div class="empty-state" th:if="${profile.recentLessons == null or #lists.isEmpty(profile.recentLessons)}">
+                    <div class="icon">📚</div>
+                    <h4 style="font-size: 18px; margin-bottom: 8px; color: var(--text);">Пока нет пройденных уроков</h4>
+                    <p>После прохождения уроков они появятся здесь.</p>
+                </div>
+            </section>
+        </main>
+    </div>
+</div>
+</body>
+</html>

@@ -2,16 +2,20 @@ package com.example.studytracker_1.model;
 
 import com.example.studytracker_1.entity.Tag;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.List;
 
-@Setter
-@Getter
 @Entity
 @Table(name = "lessons")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Setter
+@Getter
 public class Lesson {
 
     @Id
@@ -19,46 +23,37 @@ public class Lesson {
     private Long id;
 
     @Column(nullable = false)
-    private String question;
-
-    @Column(name = "option_1", nullable = false)
-    private String option1;
-
-    @Column(name = "option_2", nullable = false)
-    private String option2;
-
-    @Column(name = "option_3")
-    private String option3;
-
-    @Column(name = "option_4")
-    private String option4;
-
-    @Column(name = "correct_answer", nullable = false)
-    private Integer correctAnswer;
-
-    @Column(name = "is_answered")
-    private Boolean answered = false;
-
-    @Column(name = "is_correct")
-    private Boolean isCorrect;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    private String title; // название урока
 
     @Column(columnDefinition = "TEXT")
-    private String description;        // описание урока
+    private String description; // описание урока
 
+    @OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("questionNumber ASC")
+    private List<Question> questions = new ArrayList<>();
+
+    @Column(name = "is_answered")
+    private Boolean answered = false; // отвечал ли пользователь
+
+    // ===== ПОЛЯ ДЛЯ ПРОХОЖДЕНИЯ =====
     @Column(name = "difficulty")
-    private String difficulty = "EASY"; // EASY, MEDIUM, HARD
+    private Difficulty difficulty = Difficulty.EASY; // EASY, MEDIUM, HARD
 
     @Column(name = "points")
-    private Integer points = 0;        // баллы за урок
+    private Integer points = 0; // баллы за урок
+
+    @Column(name = "total_points")
+    private Integer totalPoints = 0; // всего баллов (если нужно)
 
     @Column(name = "ai_generated")
     private Boolean aiGenerated = false; // создан ли AI
 
-    @ManyToMany
+    // ===== СВЯЗИ =====
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user; // кто создал/проходит
+
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "lesson_tags",
             joinColumns = @JoinColumn(name = "lesson_id"),
@@ -66,15 +61,41 @@ public class Lesson {
     )
     private Set<Tag> tags = new HashSet<>();
 
-    public Lesson() {}
-
-    public Lesson(String question, String option1, String option2, String option3, String option4, Integer correctAnswer) {
-        this.question = question;
-        this.option1 = option1;
-        this.option2 = option2;
-        this.option3 = option3;
-        this.option4 = option4;
-        this.correctAnswer = correctAnswer;
+    public Lesson(List<Question> questions) {
+        this.questions = questions != null ? questions : new ArrayList<>();
+        for (Question q : this.questions) {
+            q.setLesson(this); // каждый вопрос знает свой урок
+        }
     }
 
+    // Новый конструктор с названием
+    public Lesson(String title, String description, Difficulty difficulty, List<Question> list, Set<Tag> tags) {
+        this.title = title;
+        this.description = description;
+        this.difficulty = difficulty;
+        this.questions = list;
+        this.tags = tags;
+    }
+    // Новый конструктор с названием
+    public Lesson(String title, String description) {
+        this.title = title;
+        this.description = description;
+    }
+
+    @Override
+    public String toString() {
+        return "Lesson{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", questions=" + questions +
+                ", answered=" + answered +
+                ", difficulty='" + difficulty + '\'' +
+                ", points=" + points +
+                ", totalPoints=" + totalPoints +
+                ", aiGenerated=" + aiGenerated +
+                ", user=" + user +
+                ", tags=" + tags +
+                '}';
+    }
 }

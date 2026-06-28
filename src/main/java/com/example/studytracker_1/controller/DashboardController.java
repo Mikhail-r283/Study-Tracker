@@ -22,11 +22,10 @@ public class DashboardController {
 
     @GetMapping
     public String showDashboard(Model model, Principal principal) {
+
         String username = principal.getName();
-        System.out.println("=== Dashboard for user: " + username + " ===");
 
         Map<String, Object> stats = dashboardService.getStatsForUser(username);
-        System.out.println("Stats data: " + stats);
 
         model.addAttribute("stats", stats);
         return "dashboard";

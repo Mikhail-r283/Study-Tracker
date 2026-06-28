@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Результат урока</title>
+    <style>
+        • { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .result-container {
+            max-width: 600px;
+            width: 100%;
+            background: white;
+            border-radius: 24px;
+            padding: 40px 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        .result-icon { font-size: 80px; margin-bottom: 10px; }
+        .result-title { font-size: 24px; font-weight: 700; color: #333; margin-bottom: 25px; }
+        .points-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #fff3cd, #ffeeba);
+            border: 2px solid #ffc107;
+            color: #856404;
+            padding: 10px 24px;
+            border-radius: 50px;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 25px;
+        }
+        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; }
+        .stat-card { background: #f8f9fa; border-radius: 16px; padding: 20px 10px; }
+        .stat-number { font-size: 36px; font-weight: 800; margin-bottom: 5px; }
+        .stat-label { font-size: 14px; color: #666; }
+        .correct { color: #28a745; }
+        .incorrect { color: #dc3545; }
+        .total { color: #667eea; }
+        .progress-container { margin-bottom: 30px; }
+        .progress-label { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; color: #666; }
+        .progress-bar-bg { height: 14px; background: #e9ecef; border-radius: 10px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; background: linear-gradient(90deg, #28a745, #20c997); border-radius: 10px; transition: width 0.8s ease; }
+        .actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+        .btn {
+            display: inline-block;
+            padding: 14px 28px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4); }
+        .btn-secondary { background: linear-gradient(135deg, #6c757d, #495057); }
+        @media (max-width: 480px) {
+            .result-container { padding: 25px 15px; }
+            .stat-grid { grid-template-columns: 1fr; }
+            .btn { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+<div class="result-container">
+    <!-- Условная иконка через th:if вместо тернарника -->
+    <div class="result-icon" th:if="${correctAnswers == totalQuestions}">🏆</div>
+    <div class="result-icon" th:if="${correctAnswers > 0 and correctAnswers < totalQuestions}">👍</div>
+    <div class="result-icon" th:if="${correctAnswers == 0}">💪</div>
+
+    <!-- Заголовок -->
+    <h1 class="result-title" th:if="${correctAnswers == totalQuestions}">Идеально! Все ответы правильные!</h1>
+    <h1 class="result-title" th:if="${correctAnswers > 0 and correctAnswers < totalQuestions}">Отличный результат!</h1>
+    <h1 class="result-title" th:if="${correctAnswers == 0}">Не расстраивайся ! В следующий раз получится!</h1>
+
+    <!-- Очки -->
+    <div class="points-badge">
+        ⭐️ <span th:text="${points} + ' очков'">0 очков</span>
+    </div>
+
+    <!-- Статистика -->
+    <div class="stat-grid">
+        <div class="stat-card">
+            <div class="stat-number correct" th:text="${correctAnswers}">0</div>
+            <div class="stat-label">✅ Правильно</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number incorrect" th:text="${incorrectAnswers}">0</div>
+            <div class="stat-label">❌ Неправильно</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number total" th:text="${totalQuestions}">0</div>
+            <div class="stat-label">📝 Всего вопросов</div>
+        </div>
+    </div>
+
+    <!-- Прогресс-бар -->
+    <div class="progress-container">
+        <div class="progress-label">
+            <span>Прогресс</span>
+            <span th:text="${progress} + '%'">0%</span>
+        </div>
+        <div class="progress-bar-bg">
+            <div class="progress-bar-fill" th:style="'width: ' + ${progress} + '%'"></div>
+        </div>
+    </div>
+
+    <!-- Кнопки -->
+    <div class="actions">
+        <form th:action="@{'/lessons/' + ${lesson.id} + '/reset'}" method="post">
+        <button type="submit" class="btn btn-warning">
+            🔄 Пройти заново
+        </button>
+    </form>
+        <a href="/profile" class="nav-link">
+            <i class="fas fa-user"></i> Личный кабинет
+        </a>
+    </div>
+</div>
+</body>
+</html>

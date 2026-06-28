@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8"/>
     <title>Мои уроки</title>
     <style>
-        /* Общие стили сброса */
         * {
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
+            box-sizing: border-box
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 14px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 40px 20px;
@@ -20,27 +20,24 @@
 
         .container {
             max-width: 900px;
-            margin: 0 auto;
+            margin: 0 auto
         }
 
-        /* Заголовок */
         h1 {
             color: white;
             text-align: center;
             font-size: 2.5em;
             margin-bottom: 40px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3)
         }
 
-        /* Шапка с кнопками */
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 40px;
+            margin-bottom: 40px
         }
 
-        /* Кнопка Дашборд */
         .btn-dashboard {
             padding: 12px 30px;
             background: rgba(255, 255, 255, 0.2);
@@ -54,113 +51,125 @@
             text-decoration: none;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 8px
         }
 
         .btn-dashboard:hover {
             background: rgba(255, 255, 255, 0.3);
             border-color: white;
             transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(255, 255, 255, 0.2);
+            box-shadow: 0 5px 20px rgba(255, 255, 255, 0.2)
         }
 
-        .btn-dashboard::before {
-            content: "📊";
-            font-size: 1.2em;
-        }
-
-        /* Кнопка Выйти - исправленная */
         .btn-logout {
-            padding: 12px 30px;  /* Теперь как у btn-dashboard */
+            padding: 12px 30px;
             background: rgba(255, 255, 255, 0.2);
             color: white;
             border: 2px solid white;
-            border-radius: 50px;  /* Такая же скругленная, как Дашборд */
+            border-radius: 50px;
             font-size: 1em;
             font-weight: 600;
             transition: all 0.3s ease;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+            cursor: pointer
         }
 
         .btn-logout:hover {
             background: white;
             color: #667eea;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px)
         }
 
-        .btn-logout::before {
-            content: "🚪";
-            font-size: 1.2em;
-        }
-
-
-        /* Остальные стили остаются без изменений */
         .empty-state {
             text-align: center;
             background: white;
             border-radius: 15px;
             padding: 60px 40px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2)
         }
 
-        .empty-state h2 {
-            color: #333;
-            font-size: 1.8em;
-            margin-bottom: 15px;
+        /* Эффект при наведении на кнопку "Выйти" */
+        .btn-logout:hover {
+            background: white;
+            color: #667eea;
+            transform: translateY(-2px);
         }
 
-        .empty-state p {
-            color: #666;
-            font-size: 1.1em;
-            margin-bottom: 30px;
+        /* Стиль для блока "пустое состояние" (когда уроков нет) */
+        .empty-state {
+            text-align: center;
+            background: white;
+            border-radius: 15px;
+            padding: 60px 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
 
+        /* Карточка урока, которая содержит информацию и меню */
         .lesson-card {
             background: white;
             border-radius: 15px;
             padding: 25px 30px;
             margin-bottom: 20px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: relative; /* Для позиционирования меню внутри карточки */
+            transition: all 0.3s ease;
         }
 
-        .lesson-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        .lesson-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end; /* ← выравнивает кнопки вправо */
+            margin-top: 15px;
+            flex-wrap: wrap;
         }
 
-        .lesson-info {
-            flex: 1;
-        }
-
-        .lesson-title {
+        /* Заголовок вопроса урока */
+        .lesson-question {
             color: #333;
             font-size: 1.3em;
             font-weight: 600;
             margin-bottom: 8px;
         }
 
+        /* Статус урока (завершён/ожидает) */
         .lesson-status {
             display: inline-block;
             padding: 4px 12px;
             border-radius: 20px;
             font-size: 0.85em;
             font-weight: 500;
+            margin-bottom: 10px;
         }
 
+        /* Теги урока */
+        .lesson-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 10px;
+            margin-top: 5px;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 3px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+
+        /* Стиль для завершённых уроков */
         .status-completed {
             background: #d4edda;
             color: #155724;
         }
 
+        /* Стиль для ожидающих уроков */
         .status-pending {
             background: #fff3cd;
             color: #856404;
@@ -174,37 +183,190 @@
             font-size: 1em;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
             text-decoration: none;
             display: inline-block;
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        /* Основная кнопка для просмотра/ответа */
+        .btn-secondary {
+            background: #6c757d;
             color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            border: none;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
 
-        .btn-primary:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
+        /* Вторая кнопка для просмотра результата */
         .btn-secondary {
             background: #6c757d;
             color: white;
         }
 
-        .btn-secondary:hover {
-            background: #5a6268;
-            transform: scale(1.05);
+        /* Стиль для кнопки "Создать урок" с AI */
+        .ai-generate-btn {
+            transition: all 0.3s ease;
         }
 
+        /* hover эффект для AI кнопки */
+        .ai-generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Стиль для input при фокусе */
+        input[name="question"]:focus {
+            border-color: #667eea !important;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        /* Меню в карточке урока (иконка ⋮) */
+        .lesson-menu-container {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            z-index: 20;
+        }
+
+        /* Триггер открытия меню (⋮) */
+        .lesson-menu-trigger {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.06);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1.2em;
+            color: #888;
+            user-select: none;
+        }
+
+        /* hover эффект для ⋮ */
+        .lesson-menu-trigger:hover {
+            background: rgba(0, 0, 0, 0.12);
+            color: #333;
+        }
+
+        /* Контейнер меню (список действий) */
+        .lesson-menu {
+            display: none; /* по умолчанию скрыто */
+            position: absolute;
+            top: 38px;
+            right: 0;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.25);
+            min-width: 170px;
+            padding: 5px 0;
+            animation: menuFadeIn 0.2s ease;
+            z-index: 30;
+        }
+
+        /* Показывать меню, когда активна */
+        .lesson-menu.active {
+            display: block;
+        }
+
+        /* Стиль элементов меню */
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            color: #333;
+            text-decoration: none;
+            font-size: 0.95em;
+            transition: background 0.15s;
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-family: inherit;
+        }
+
+        /* hover эффект для элементов меню */
+        .menu-item:hover {
+            background: #f0f0f0;
+        }
+
+        /* Элементы опасные (удаление) */
+        .menu-item.danger {
+            color: #dc3545;
+        }
+
+        /* hover эффект для опасных элементов */
+        .menu-item.danger:hover {
+            background: #fff0f0;
+        }
+
+        /* Анимация появления меню */
+        @keyframes menuFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Кнопки фильтрации уроков */
+        .filter-btn {
+            padding: 10px 20px;
+            border: 2px solid white;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 0.95em;
+            transition: all 0.3s ease;
+        }
+
+        /* Активная кнопка фильтра */
+        .filter-btn.active {
+            background: white;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        /* hover эффект для кнопок фильтра */
+        .filter-btn:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Скрывшийся урок */
+        .lesson-card.hidden {
+            opacity: 0;
+            transform: scale(0.9);
+            max-height: 0;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .clear-filter-btn:hover {
+            background: white !important;
+            color: #dc3545 !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+        }
+
+        /* Адаптация под мобильные устройства */
         @media (max-width: 600px) {
             .lesson-card {
                 flex-direction: column;
                 text-align: center;
                 gap: 15px;
             }
+
             h1 {
                 font-size: 2em;
             }
@@ -213,83 +375,420 @@
 </head>
 <body>
 <div class="container">
-    <!-- Шапка с кнопками -->
+    <!-- Шапка с навигацией -->
     <div class="header">
         <a th:href="@{/dashboard}" class="btn-dashboard">Дашборд</a>
-        <form th:action="@{/logout}" method="post">
-            <button type="submit" class="btn-logout">Выйти</button>
-        </form>
-    </div>
+        <div class="user-menu-container" style="position:relative; display:inline-block;">
+            <!-- Иконка/фото пользователя -->
+            <div onclick="toggleUserMenu(this)" style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.15);transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                <span style="font-size:20px;color:white;">👤</span>
+            </div>
 
-    <h1>📚 Мои уроки</h1>
-
-    <div style="background: white; border: 2px solid #667eea; border-radius: 12px; padding: 20px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(102,126,234,0.1);">
-        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
-            <span style="font-size: 2em;">🤖</span>
-            <div>
-                <h3 style="margin: 0; color: #333;">Создать урок с помощью AI</h3>
-                <p style="margin: 5px 0 0 0; color: #666;">Введите тему, и нейросеть сгенерирует готовый урок</p>
+            <!-- Выпадающее меню -->
+            <div class="user-dropdown" style="display:none;position:absolute;top:50px;right:0;background:white;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,0.15);min-width:180px;z-index:1000;overflow:hidden;">
+                <a href="/profile" style="display:flex;align-items:center;gap:12px;padding:14px 20px;color:#333;text-decoration:none;transition:background 0.2s;border-bottom:1px solid #f0f0f0;" onmouseover="this.style.background='#f5f5f5'" onmouseout="this.style.background='transparent'">
+                    <span style="font-size:18px;">👤</span>
+                    <span style="font-size:15px;font-weight:500;">Профиль</span>
+                </a>
+                <a href="/logout" style="display:flex;align-items:center;gap:12px;padding:14px 20px;color:#e74c3c;text-decoration:none;transition:background 0.2s;" onmouseover="this.style.background='#fff5f5'" onmouseout="this.style.background='transparent'">
+                    <span style="font-size:18px;">🚪</span>
+                    <span style="font-size:15px;font-weight:500;">Выйти</span>
+                </a>
             </div>
         </div>
 
-        <form th:action="@{/lessons/generate}" method="post">
-            <div style="display: flex; gap: 10px;">
-                <input type="text"
-                       name="question"
-                       placeholder="Например: Производные функции..."
-                       required
-                       style="flex: 1; padding: 12px 15px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; outline: none; transition: border-color 0.3s ease;">
-                <button type="submit"
-                        class="ai-generate-btn"
-                        style="padding: 12px 25px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px;">
-                    ✨ Сгенерировать
-                </button>
+        <script>
+            function toggleUserMenu(btn) {
+                var dropdown = btn.nextElementSibling;
+                var isVisible = dropdown.style.display === 'block';
+
+                // Закрываем все другие меню
+                document.querySelectorAll('.user-dropdown').forEach(function(d) {
+                    d.style.display = 'none';
+                });
+
+                if(!isVisible){
+                    dropdown.style.display = 'block';
+                }
+            }
+
+            // Закрываем меню при клике вне его
+            document.addEventListener('click', function(e) {
+                if(!e.target.closest('.user-menu-container')){
+                    document.querySelectorAll('.user-dropdown').forEach(function(d) {
+                        d.style.display = 'none';
+                    });
+                }
+            });
+        </script>
+
+    </div>
+
+    <!-- Заголовок раздела -->
+    <h1>📚 Мои уроки</h1>
+
+    <!-- Блок фильтров: по статусу и тегам -->
+    <div style="margin-bottom:20px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+        <!-- Фильтры по статусу -->
+        <button class="filter-btn active" onclick="filterLessons('all', this)">🏠 Все</button>
+        <button class="filter-btn" onclick="filterLessons('completed', this)">✅ Завершённые</button>
+        <button class="filter-btn" onclick="filterLessons('pending', this)">⏳ В ожидании</button>
+        <button class="clear-filter-btn" onclick="resetFilters()"
+                style="display:none;padding:8px 16px;border-radius:20px;border:2px solid #dc3545;background:#dc3545;color:white;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.3s ease;">
+            ❌ Сбросить фильтр
+        </button>
+    </div>
+
+
+    <!-- Блок создания урока с AI -->
+    <div  id="ai-block" style="background:white;border:2px solid #667eea;border-radius:12px;padding:20px;margin-bottom:30px;box-shadow:0 4px 15px rgba(102,126,234,0.1);">
+        <!-- Заголовок -->
+        <div style="display:flex;align-items:center;gap:15px;margin-bottom:15px;">
+            <span style="font-size:2em;">🤖</span>
+            <div>
+                <h3 style="margin:0;color:#333;">Создать урок с помощью AI</h3>
+                <p style="margin:5px 0 0 0;color:#666;">Введите тему, и нейросеть сгенерирует готовый урок</p>
             </div>
+        </div>
+        <!-- Форма генерации по вопросу -->
+        <form th:action="@{/lessons/generate/AI}" method="post">
+            <div style="display:flex;gap:10px;">
+                <input type="text" name="topic" placeholder="Например: Производные функции..." required style="flex:1;padding:12px 15px;border:2px solid #ddd;border-radius:8px;font-size:16px;outline:none;">
+                <button type="submit" class="ai-generate-btn" style="padding:12px 25px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;border:none;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;">✨ Сгенерировать</button>
+            </div>
+        </form>
+
+        <form action="/lessons/generate/random" method="post" style="margin-top:10px;">
+            <button type="submit" style="background:linear-gradient(135deg,#ff6b6b,#ee5a24);color:white;padding:12px 25px;border:none;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;transition:all 0.3s ease;width:100%;">🎲 Случайный урок</button>
         </form>
     </div>
 
-    <style>
-        .ai-generate-btn {
-            transition: all 0.3s ease;
-        }
-        .ai-generate-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102,126,234,0.4);
-            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
-        }
-        input[name="question"]:focus {
-            border-color: #667eea !important;
-            box-shadow: 0 0 0 3px rgba(102,126,234,0.2);
-        }
-    </style>
 
-    <!-- Пустое состояние -->
-    <div class="empty-state" th:if="${lessons == null or #lists.isEmpty(lessons)}">
-        <div style="font-size: 4em; margin-bottom: 20px;">📖</div>
+    <!-- Пустое состояние, если уроков нет -->
+    <div class="empty-state" th:if="${lessons == null or lessons.isEmpty()}">
+        <div style="font-size:4em;margin-bottom:20px;">📖</div>
         <h2>Уроков пока нет</h2>
         <p>Добавьте свои первые уроки, чтобы начать обучение!</p>
     </div>
 
-    <!-- Список уроков -->
     <div th:unless="${lessons == null or #lists.isEmpty(lessons)}">
-        <div class="lesson-card" th:each="lesson : ${lessons}">
-            <div class="lesson-info">
-                <div class="lesson-question" th:text="${lesson.question}">Название урока</div>
-                <div>
-                    <span class="lesson-status"
-                          th:classappend="${lesson.answered} ? 'status-completed' : 'status-pending'"
-                          th:text="${lesson.answered} ? '✅ Завершён' : '⏳ Ожидает ответа'">
-                        Статус
-                    </span>
-                </div>
+        <p id="lesson-info" style="color: rgba(255,255,255,0.8); margin-bottom: 20px; text-align: center;">
+            Найдено уроков: <strong id="lesson-count" style="color: white;">[[${#lists.size(lessons)}]]</strong>
+        </p>
+
+        <!-- Каждая карточка урока -->
+        <div th:each="lesson : ${lessons}"
+             class="lesson-card"
+             th:attr="data-answered=${lesson.answered ? 'true' : 'false'}"
+             style="position: relative;">
+
+            <!-- Кнопка трёх точек в правом верхнем углу -->
+            <div class="card-menu" style="position: absolute; top: 8px; right: 8px; z-index: 10;">
+                <button type="button" class="dropdown-item-delete"
+                        th:attr="data-lesson-id=${lesson.id}"
+                        style="display: block; width: 100%; padding: 10px 16px; color: #e74c3c; background: none; border: none; text-align: left; font-size: 14px; cursor: pointer;"
+                        onclick="event.stopPropagation(); deleteLesson(this)">
+                    🗑 Удалить
+                </button>
             </div>
-            <a th:href="@{/lessons/{id}(id=${lesson.id})}"
-               th:classappend="${lesson.answered} ? 'btn-secondary' : 'btn-primary'"
-               class="btn">
-                <span th:if="${lesson.answered}" th:text="'📊 Посмотреть результат'">Посмотреть результат</span>
-                <span th:unless="${lesson.answered}" th:text="'✏️ Ответить'">Ответить</span>
-            </a>
+
+            <div style="flex: 1;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                    <span style="color: #999; font-size: 0.9em;">#[[${lesson.id}]]</span>
+                    <span class="lesson-status"
+                          th:classappend="|difficulty-${#strings.toLowerCase(lesson.difficulty)}|"
+                          th:text="${lesson.difficulty}">EASY</span>
+                </div>
+                <span class="lesson-question" th:text="${lesson.title}">Title</span>
+                <p style="color: #666; margin-top: 5px; font-size: 0.95em;" th:text="${lesson.description}">Description</p>
+            </div>
+
+            <div class="lesson-actions">
+        <span style="color: #888; font-size: 0.9em; display: block; text-align: right; margin-bottom: 8px;">
+            <span th:if="${lesson.answered}" style="color: #28a745;">✅ Завершён</span>
+            <span th:unless="${lesson.answered}" style="color: #ffc107;">⏳ В ожидании</span>
+            <br>
+            📝 Вопросов: <strong th:text="${lesson.questions != null ? #lists.size(lesson.questions) : 0}">0</strong>
+        </span>
+                <a th:href="@{/lessons/{id}(id=${lesson.id})}"
+                   style="display: inline-block; padding: 8px 20px; background: #667eea; color: white; border-radius: 20px; text-decoration: none; font-weight: 500; transition: 0.3s;"
+                   onmouseover="this.style.background='#764ba2'"
+                   onmouseout="this.style.background='#667eea'">
+                    Перейти к уроку →
+                </a>
+            </div>
         </div>
+
+        <!-- Пагинация -->
+        <div id="pagination" style="display:flex;justify-content:center;align-items:center;gap:15px;margin-top:30px;padding:20px 0;">
+            <button id="prevPage" onclick="changePage(-1)" style="padding:10px 20px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;transition:all 0.3s ease;display:flex;align-items:center;gap:8px;" onmouseover="this.style.transform='translateX(-3px)'" onmouseout="this.style.transform='translateX(0)'" disabled>
+                ← Предыдущая
+            </button>
+
+            <!-- Информация о количестве уроков -->
+            <div id="counter" style="color:white;margin-bottom:15px;font-size:1.1em;text-align:center;">
+                <span id="pageInfo">Страница 1 из 1</span><br>
+                Показано: <span id="visibleCount">0</span> из <span id="totalCount">0</span> уроков
+            </div>
+
+            <button id="nextPage" style="padding:10px 20px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;transition:all 0.3s ease;display:flex;align-items:center;gap:8px;" onmouseover="this.style.transform='translateX(3px)'" onmouseout="this.style.transform='translateX(0)'" disabled>
+                Следующая →
+            </button>
+        </div>
+
+
+
+        <script>
+            (function () {
+                var currentPage = 1;
+                var lessonsPerPage = 5;
+                var currentFilter = 'all';
+
+                function getAllCards() {
+                    return Array.prototype.slice.call(document.querySelectorAll('.lesson-card'));
+                }
+
+                function isCardMatchFilter(card) {
+                    if (currentFilter === 'all') return true;
+                    if (currentFilter === 'completed') {
+                        return card.getAttribute('data-answered') === 'true';
+                    }
+                    if (currentFilter === 'pending') {
+                        return card.getAttribute('data-answered') === 'false';
+                    }
+                    return true;
+                }
+
+                function getFilteredCards() {
+                    return getAllCards().filter(isCardMatchFilter);
+                }
+
+                function updateLessonCounts() {
+                    var filteredCards = getFilteredCards();
+                    var startIndex = (currentPage - 1) * lessonsPerPage;
+                    var pageCards = filteredCards.slice(startIndex, startIndex + lessonsPerPage);
+
+                    var visibleCountEl = document.getElementById('visibleCount');
+                    var totalCountEl = document.getElementById('totalCount');
+                    var lessonCountEl = document.getElementById('lesson-count');
+
+                    if (visibleCountEl) {
+                        visibleCountEl.textContent = pageCards.length;
+                    }
+
+                    if (totalCountEl) {
+                        totalCountEl.textContent = filteredCards.length;
+                    }
+
+                    // Это общий счетчик всех уроков на странице (не фильтр)
+                    if (lessonCountEl) {
+                        lessonCountEl.textContent = getAllCards().length;
+                    }
+                }
+
+                function updatePagination() {
+                    var allCards = getFilteredCards();
+                    var totalPages = Math.max(1, Math.ceil(allCards.length / lessonsPerPage));
+
+                    if (currentPage > totalPages) currentPage = totalPages;
+                    if (currentPage < 1) currentPage = 1;
+
+                    // Скрываем все карточки
+                    getAllCards().forEach(function (card) {
+                        card.style.display = 'none';
+                    });
+
+                    // Показываем только карточки текущей страницы
+                    var startIndex = (currentPage - 1) * lessonsPerPage;
+                    var pageCards = allCards.slice(startIndex, startIndex + lessonsPerPage);
+
+                    pageCards.forEach(function (card) {
+                        card.style.display = 'flex';
+                    });
+
+                    // Обновляем текст страницы
+                    var pageInfo = document.getElementById('pageInfo');
+                    if (pageInfo) {
+                        pageInfo.textContent = 'Страница ' + currentPage + ' из ' + totalPages;
+                    }
+
+                    // Кнопки пагинации
+                    var prevBtn = document.getElementById('prevPage');
+                    var nextBtn = document.getElementById('nextPage');
+
+                    if (prevBtn) {
+                        prevBtn.disabled = currentPage <= 1;
+                        prevBtn.style.opacity = prevBtn.disabled ? '0.5' : '1';
+                        prevBtn.style.cursor = prevBtn.disabled ? 'not-allowed' : 'pointer';
+                    }
+
+                    if (nextBtn) {
+                        nextBtn.disabled = currentPage >= totalPages;
+                        nextBtn.style.opacity = nextBtn.disabled ? '0.5' : '1';
+                        nextBtn.style.cursor = nextBtn.disabled ? 'not-allowed' : 'pointer';
+                    }
+
+                    updateLessonCounts();
+                }
+
+                window.changePage = function (delta) {
+                    currentPage += delta;
+                    updatePagination();
+                };
+
+                window.filterLessons = function (tag, button) {
+                    currentFilter = tag;
+                    currentPage = 1;
+
+                    // Активная кнопка фильтра
+                    var buttons = document.querySelectorAll('.filter-btn');
+                    buttons.forEach(function (btn) {
+                        btn.classList.remove('active');
+                    });
+
+                    if (button) {
+                        button.classList.add('active');
+                    }
+
+                    var aiBlock = document.getElementById('ai-block');
+                    var lessonInfo = document.getElementById('lesson-info');
+                    var clearBtn = document.querySelector('.clear-filter-btn');
+
+                    if (aiBlock) {
+                        aiBlock.style.display = (tag === 'all') ? 'block' : 'none';
+                    }
+
+                    if (lessonInfo) {
+                        lessonInfo.style.display = (tag === 'all') ? 'block' : 'none';
+                    }
+
+                    if (clearBtn) {
+                        clearBtn.style.display = (tag !== 'all') ? 'inline-block' : 'none';
+                    }
+
+                    updatePagination();
+                };
+
+                window.resetFilters = function () {
+                    currentFilter = 'all';
+                    currentPage = 1;
+
+                    var allBtn = null;
+                    document.querySelectorAll('.filter-btn').forEach(function (btn) {
+                        btn.classList.remove('active');
+                        if (btn.textContent.indexOf('Все') !== -1) {
+                            allBtn = btn;
+                        }
+                    });
+
+                    if (allBtn) {
+                        allBtn.classList.add('active');
+                    }
+
+                    var aiBlock = document.getElementById('ai-block');
+                    var lessonInfo = document.getElementById('lesson-info');
+                    var clearBtn = document.querySelector('.clear-filter-btn');
+
+                    if (aiBlock) {
+                        aiBlock.style.display = 'block';
+                    }
+
+                    if (lessonInfo) {
+                        lessonInfo.style.display = 'block';
+                    }
+
+                    if (clearBtn) {
+                        clearBtn.style.display = 'none';
+                    }
+
+                    updatePagination();
+                };
+
+                window.toggleUserMenu = function (btn) {
+                    var dropdown = btn.nextElementSibling;
+                    var isVisible = dropdown.style.display === 'block';
+
+                    // Закрываем все другие меню
+                    document.querySelectorAll('.user-dropdown').forEach(function (d) {
+                        d.style.display = 'none';
+                    });
+
+                    if (!isVisible) {
+                        dropdown.style.display = 'block';
+                    }
+                };
+
+                document.addEventListener('click', function (e) {
+                    if (!e.target.closest('.user-menu-container')) {
+                        document.querySelectorAll('.user-dropdown').forEach(function (d) {
+                            d.style.display = 'none';
+                        });
+                    }
+                });
+
+                window.deleteLesson = function (btn) {
+                    if (!confirm('Удалить этот урок?')) return;
+
+                    var lessonId = btn.getAttribute('data-lesson-id');
+                    var card = btn.closest('.lesson-card');
+
+                    var csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+                    var csrfHeader = document.querySelector('meta[name="csrfheader"]')?.getAttribute('content');
+
+                    var headers = {
+                        'Content-Type': 'application/json'
+                    };
+
+                    if (csrfToken && csrfHeader) {
+                        headers[csrfHeader] = csrfToken;
+                    }
+
+                    fetch('/lessons/' + lessonId + '/delete', {
+                        method: 'POST',
+                        headers: headers
+                    })
+                        .then(function (response) {
+                            if (response.ok) {
+                                card.style.transition = 'all 0.4s ease';
+                                card.style.opacity = '0';
+                                card.style.transform = 'scale(0.8) translateY(-20px)';
+
+                                setTimeout(function () {
+                                    card.remove();
+
+                                    // Обновляем счетчик всех уроков
+                                    var countEl = document.getElementById('lesson-count');
+                                    if (countEl) {
+                                        countEl.textContent = getAllCards().length;
+                                    }
+
+                                    updatePagination();
+                                }, 400);
+                            } else {
+                                alert('Ошибка при удалении');
+                            }
+                        })
+                        .catch(function () {
+                            alert('Ошибка сети');
+                        });
+                };
+
+                document.addEventListener('DOMContentLoaded', function () {
+                    var nextBtn = document.getElementById('nextPage');
+                    if (nextBtn) {
+                        nextBtn.addEventListener('click', function () {
+                            var totalPages = Math.max(1, Math.ceil(getFilteredCards().length / lessonsPerPage));
+                            if (currentPage < totalPages) {
+                                currentPage++;
+                                updatePagination();
+                            }
+                        });
+                    }
+
+                    updatePagination();
+                });
+            })();</script>
+
     </div>
 </div>
 </body>

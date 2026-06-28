@@ -1,134 +1,123 @@
 package com.example.studytracker_1.service;
 
 import com.example.studytracker_1.model.Lesson;
+import com.example.studytracker_1.model.Question;
 import com.example.studytracker_1.model.Statistics;
 import com.example.studytracker_1.model.User;
 import com.example.studytracker_1.repository.LessonRepository;
+import com.example.studytracker_1.repository.QuestionRepository;
 import com.example.studytracker_1.repository.StatisticsRepository;
 import com.example.studytracker_1.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
+
 
 @Service
 public class DashboardService {
-
     private final LessonRepository lessonRepository;
-    private final StatisticsRepository statisticsRepository;
     private final UserRepository userRepository;
+    private final QuestionRepository questionRepository;
 
-    public DashboardService(LessonRepository lessonRepository, StatisticsRepository statisticsRepository, UserRepository userRepository) {
+    public DashboardService(LessonRepository lessonRepository,
+                            UserRepository userRepository, QuestionRepository questionRepository) {
         this.lessonRepository = lessonRepository;
-        this.statisticsRepository = statisticsRepository;
         this.userRepository = userRepository;
+        this.questionRepository = questionRepository;
     }
 
     public Map<String, Object> getStatsForUser(String username) {
         Map<String, Object> stats = new HashMap<>();
-        long startTime = System.currentTimeMillis();
 
-        try {
-            // Получаем пользователя
-            User user = userRepository.findByUsername(username)
-                    .orElseThrow(() -> new RuntimeException("User not found: " + username));
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found: " + username));
 
-            // Получаем все уроки пользователя
-            List<Lesson> userLessons = lessonRepository.findByUserId(user.getId());
+        List<Lesson> userLessons = lessonRepository.findByUserId(user.getId());
+        List<Long> lessonIds = userLessons.stream().map(Lesson::getId).collect(Collectors.toList());
 
-            // Считаем статистику
-            long totalLessons = userLessons.size();
+        // Явный подсчёт через репозиторий
+        long totalQuestions = questionRepository.countByLessonIdIn(lessonIds);
+        long answeredQuestions = questionRepository.countByLessonIdInAndAnswered(lessonIds, true);
+        long correctQuestions = questionRepository.countByLessonIdInAndIsCorrect(lessonIds, true);
 
-            // Исправлено: используем правильные методы Boolean
-            long answeredCount = userLessons.stream()
-                    .filter(lesson -> lesson.getAnswered() == Boolean.TRUE)
-                    .count();
+        long incorrectQuestions = answeredQuestions - correctQuestions;
+        if (incorrectQuestions < 0) incorrectQuestions = 0;
 
-            long correctCount = userLessons.stream()
-                    .filter(lesson -> {
-                        Boolean isCorrect = lesson.getIsCorrect();
-                        return isCorrect != null && isCorrect;
-                    })
-                    .count();
+        double percent = answeredQuestions > 0
+                ? (correctQuestions * 100.0 / answeredQuestions)
+                : 0;
 
-            long incorrectCount = answeredCount - correctCount;
-            if (incorrectCount < 0) incorrectCount = 0;
+        stats.put("totalLessons", (long) userLessons.size());
+        stats.put("answeredLessons", userLessons.stream().filter(Lesson::getAnswered).count());
+        stats.put("unansweredLessons", userLessons.stream().filter(l -> !Boolean.TRUE.equals(l.getAnswered())).count());
 
-            double percent = answeredCount > 0 ? (correctCount * 100.0 / answeredCount) : 0;
-
-            stats.put("totalLessons", totalLessons);
-            stats.put("answeredCount", answeredCount);
-            stats.put("correctCount", correctCount);
-            stats.put("incorrectCount", incorrectCount);
-            stats.put("correctPercent", Math.round(percent * 100.0) / 100.0);
-            stats.put("score", (int) Math.round(percent));
-
-            System.out.println("✅ Статистика для " + username +
-                    ": всего=" + totalLessons +
-                    ", отвечено=" + answeredCount +
-                    ", правильно=" + correctCount +
-                    ", время=" + (System.currentTimeMillis() - startTime) + "ms");
-
-        } catch (Exception e) {
-            System.out.println("❌ Ошибка в getStatsForUser: " + e.getMessage());
-            e.printStackTrace();
-
-            // Запасные данные
-            stats.put("totalLessons", 0L);
-            stats.put("answeredCount", 0L);
-            stats.put("correctCount", 0L);
-            stats.put("incorrectCount", 0L);
-            stats.put("correctPercent", 0.0);
-            stats.put("score", 0);
-        }
+        stats.put("totalQuestions", totalQuestions);
+        stats.put("answeredQuestions", answeredQuestions);
+        stats.put("correctQuestions", correctQuestions);
+        stats.put("incorrectQuestions", incorrectQuestions);
+        stats.put("correctPercent", Math.round(percent * 100.0) / 100.0);
+        stats.put("score", (int) Math.round(percent));
 
         return stats;
     }
 
     public Map<String, Object> getStats() {
         Map<String, Object> stats = new HashMap<>();
-
         try {
             List<Lesson> allLessons = lessonRepository.findAll();
+
+            // Статистика по урокам
             long totalLessons = allLessons.size();
-
-            // Исправлено: используем Boolean
-            long answeredCount = allLessons.stream()
-                    .filter(lesson -> lesson.getAnswered() == Boolean.TRUE)
+            long answeredLessons = allLessons.stream()
+                    .filter(lesson -> Boolean.TRUE.equals(lesson.getAnswered()))
                     .count();
 
-            long correctCount = allLessons.stream()
-                    .filter(lesson -> {
-                        Boolean isCorrect = lesson.getIsCorrect();
-                        return isCorrect != null && isCorrect;
-                    })
+            // Статистика по вопросам
+            List<Question> allQuestions = allLessons.stream()
+                    .flatMap(lesson -> lesson.getQuestions().stream())
+                    .collect(Collectors.toList());
+
+            long totalQuestions = allQuestions.size();
+            long answeredQuestions = allQuestions.stream()
+                    .filter(q -> Boolean.TRUE.equals(q.getAnswered()))
                     .count();
+            long correctQuestions = allQuestions.stream()
+                    .filter(q -> Boolean.TRUE.equals(q.getIsCorrect()))
+                    .count();
+            long incorrectQuestions = answeredQuestions - correctQuestions;
+            if (incorrectQuestions < 0) incorrectQuestions = 0;
 
-            long incorrectCount = answeredCount - correctCount;
-            if (incorrectCount < 0) incorrectCount = 0;
-
-            double percent = answeredCount > 0 ? (correctCount * 100.0 / answeredCount) : 0;
+            double percent = answeredQuestions > 0
+                    ? (correctQuestions * 100.0 / answeredQuestions)
+                    : 0;
 
             stats.put("totalLessons", totalLessons);
-            stats.put("answeredCount", answeredCount);
-            stats.put("correctCount", correctCount);
-            stats.put("incorrectCount", incorrectCount);
+            stats.put("answeredLessons", answeredLessons);
+            stats.put("unansweredLessons", totalLessons - answeredLessons);
+            stats.put("totalQuestions", totalQuestions);
+            stats.put("answeredQuestions", answeredQuestions);
+            stats.put("correctQuestions", correctQuestions);
+            stats.put("incorrectQuestions", incorrectQuestions);
             stats.put("correctPercent", Math.round(percent * 100.0) / 100.0);
             stats.put("score", (int) Math.round(percent));
 
-            System.out.println("✅ Общая статистика: всего=" + totalLessons);
+            System.out.println("✅ Общая статистика: уроков=" + totalLessons +
+                    ", вопросов=" + totalQuestions);
 
         } catch (Exception e) {
             System.out.println("❌ Ошибка в getStats: " + e.getMessage());
             e.printStackTrace();
-
             stats.put("totalLessons", 0L);
-            stats.put("answeredCount", 0L);
-            stats.put("correctCount", 0L);
-            stats.put("incorrectCount", 0L);
+            stats.put("answeredLessons", 0L);
+            stats.put("unansweredLessons", 0L);
+            stats.put("totalQuestions", 0L);
+            stats.put("answeredQuestions", 0L);
+            stats.put("correctQuestions", 0L);
+            stats.put("incorrectQuestions", 0L);
             stats.put("correctPercent", 0.0);
             stats.put("score", 0);
         }
-
         return stats;
     }
 }

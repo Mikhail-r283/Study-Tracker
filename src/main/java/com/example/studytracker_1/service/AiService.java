@@ -35,15 +35,25 @@ public class AiService {
     public String generate(String topic) {
         System.out.println("🤖🤖🤖 AiService.generate вызван с темой: " + topic);
         String prompt = String.format("""
-            Сгенерируй учебный вопрос по теме: '%s'.
-            Ответ строго в JSON:
+        Сгенерируй учебный урок по теме: '%s'.
+        
+        Ответ строго в JSON без markdown:
+        {
+          "title": "...",
+          "description": "...",
+          "difficulty": "EASY/MEDIUM/HARD",
+          "questions": [
             {
-              "question": "...",
+              "question": "Вопрос?",
               "options": ["вар1", "вар2", "вар3", "вар4"],
               "correctIndex": 0,
-              "description": "..."
+              "description": "Объяснение"
             }
-            """, topic);
+          ]
+        }
+        
+        Сгенерируй 3-5 вопросов.
+        """, topic);
 
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("model", model);

@@ -34,6 +34,22 @@ public class User {
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    // Новые поля для личного кабинета
+    @Column(name = "first_name")
+    private String firstName;
+
+    @Column(name = "last_name")
+    private String lastName;
+
+    @Column(name = "avatar_url")
+    private String avatarUrl;
+
+    @Column(name = "bio")
+    private String bio;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt = LocalDateTime.now();
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "users_roles",
@@ -45,4 +61,29 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Lesson> lessons = new ArrayList<>();
 
+    // Вычисляемые поля (не сохраняются в БД)
+    @Transient
+    public int getCompletedLessonsCount() {
+        return (int) lessons.stream()
+                .filter(Lesson::getAnswered)
+                .count();
+    }
+
+    @Transient
+    public double getAverageScore() {
+        if (lessons.isEmpty()) return 0.0;
+        return lessons.stream()
+                .filter(Lesson::getAnswered)
+                .mapToInt(Lesson::getPoints)
+                .average()
+                .orElse(0.0);
+    }
+
+    @Transient
+    public String getFullName() {
+        if (firstName != null && lastName != null) {
+            return firstName + " " + lastName;
+        }
+        return username;
+    }
 }
